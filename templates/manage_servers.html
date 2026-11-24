@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Manage servers{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+  <h1>Manage servers</h1>
+  <p class="lede">Add, edit, or remove up to 5 demo hosts. SSH fields are inventory metadata only — metrics are mock data.</p>
+</section>
+
+{% if servers %}
+{# Server table / forms arrive in Phase 2 #}
+{% else %}
+<div class="empty-state" role="status">
+  <p class="empty-title">No servers yet</p>
+  <p class="empty-copy">Inventory is empty. Server add / edit / delete arrives in a later phase; this page is the shell for that workflow.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Server detail{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+  <p class="breadcrumb"><a href="{{ url_for('dashboard') }}">Dashboard</a> / Server</p>
+  <h1>Server detail</h1>
+  <p class="lede">Live metrics, short charts, and listening ports for a single host.</p>
+</section>
+
+{% if server %}
+{# Populated in later phases #}
+{% else %}
+<div class="empty-state" role="status">
+  <p class="empty-title">Server not found</p>
+  <p class="empty-copy">No inventory entry for <span class="mono">{{ server_id }}</span>. Add servers from Manage servers, then open them from the dashboard.</p>
+  <a class="btn" href="{{ url_for('manage_servers') }}">Manage servers</a>
+</div>
+{% endif %}
+{% endblock %}

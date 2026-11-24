@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+  <h1>Dashboard</h1>
+  <p class="lede">Overview of monitored Linux servers. Metrics refresh every 5 seconds once inventory is configured.</p>
+</section>
+
+{% if servers %}
+<ul class="server-grid">
+  {% for server in servers %}
+  <li class="server-card">
+    <a href="{{ url_for('server_detail', server_id=server.id) }}">
+      <span class="server-label">{{ server.label or server.host }}</span>
+      <span class="server-host mono">{{ server.host }}</span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty-state" role="status">
+  <p class="empty-title">No servers yet</p>
+  <p class="empty-copy">Add up to 5 Linux servers in Manage servers to see live mock metrics here.</p>
+  <a class="btn" href="{{ url_for('manage_servers') }}">Manage servers</a>
+</div>
+{% endif %}
+{% endblock %}
