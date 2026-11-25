@@ -5,15 +5,62 @@
 {% block content %}
 <section class="page-intro">
   <h1>Manage servers</h1>
-  <p class="lede">Add, edit, or remove up to 5 demo hosts. SSH fields are inventory metadata only — metrics are mock data.</p>
+  <p class="lede">Add, edit, or remove up to {{ max_servers }} demo hosts. SSH fields are inventory metadata only — metrics are mock data.</p>
 </section>
 
-{% if servers %}
-{# Server table / forms arrive in Phase 2 #}
-{% else %}
-<div class="empty-state" role="status">
-  <p class="empty-title">No servers yet</p>
-  <p class="empty-copy">Inventory is empty. Server add / edit / delete arrives in a later phase; this page is the shell for that workflow.</p>
-</div>
-{% endif %}
+<section class="manage-layout">
+  <div>
+    <h2 class="section-title">Inventory ({{ servers|length }}/{{ max_servers }})</h2>
+    {% if servers %}
+    <ul class="inventory-list">
+      {% for server in servers %}
+      <li class="inventory-item" id="server-{{ server.id }}">
+        <div class="inventory-meta">
+          <strong>{{ server.label or server.hostname }}</strong>
+          <span class="mono">{{ server.hostname }} · {{ server.ssh_user }}@{{ server.ssh_port }}</span>
+        </div>
+        <details class="edit-panel">
+          <summary>Edit</summary>
+          <form method="post" action="{{ url_for('manage_servers') }}" class="stack-form compact">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="server_id" value="{{ server.id }}">
+            <label>Hostname / IP<input type="text" name="hostname" required maxlength="253" value="{{ server.hostname }}"></label>
+            <label>SSH user<input type="text" name="ssh_user" required maxlength="64" value="{{ server.ssh_user }}"></label>
+            <label>SSH port<input type="number" name="ssh_port" required min="1" max="65535" value="{{ server.ssh_port }}"></label>
+            <label>Label<input type="text" name="label" maxlength="64" value="{{ server.label }}"></label>
+            <button type="submit" class="btn">Save</button>
+          </form>
+        </details>
+        <form method="post" action="{{ url_for('manage_servers') }}" class="inline-delete" onsubmit="return confirm('Delete this server from inventory?');">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="server_id" value="{{ server.id }}">
+          <button type="submit" class="btn-danger">Delete</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state" role="status">
+      <p class="empty-title">No servers yet</p>
+      <p class="empty-copy">Use the form to add your first demo host (max {{ max_servers }}).</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div>
+    <h2 class="section-title">Add server</h2>
+    {% if at_limit %}
+    <p class="form-error" role="status">Maximum of {{ max_servers }} servers reached. Delete one to add another.</p>
+    {% else %}
+    <form method="post" action="{{ url_for('manage_servers') }}" class="stack-form panel-form">
+      <input type="hidden" name="action" value="add">
+      <label>Hostname / IP<input type="text" name="hostname" required maxlength="253" placeholder="10.0.0.12 or app-01.local"></label>
+      <label>SSH user<input type="text" name="ssh_user" required maxlength="64" placeholder="ubuntu"></label>
+      <label>SSH port<input type="number" name="ssh_port" required min="1" max="65535" value="22"></label>
+      <label>Label <span class="muted">(optional)</span><input type="text" name="label" maxlength="64" placeholder="App API"></label>
+      <button type="submit" class="btn">Add server</button>
+    </form>
+    {% endif %}
+  </div>
+</section>
 {% endblock %}

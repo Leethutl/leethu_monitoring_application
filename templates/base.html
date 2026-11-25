@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
 </head>
 <body>
   <div class="page">
@@ -17,18 +18,35 @@
         <span class="brand-name">Leethu</span>
       </a>
       <nav class="site-nav" aria-label="Main">
+        {% if session.get('user') %}
         <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}is-active{% endif %}">Dashboard</a>
         <a href="{{ url_for('manage_servers') }}" class="{% if request.endpoint == 'manage_servers' %}is-active{% endif %}">Manage servers</a>
+        <form class="logout-form" method="post" action="{{ url_for('logout') }}">
+          <button type="submit" class="btn-text">Log out</button>
+        </form>
+        {% endif %}
       </nav>
     </header>
 
+    <div class="mock-banner" role="note">Mock metrics only · no real SSH or agents</div>
+
     <main class="site-main">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flash-list">
+          {% for category, message in messages %}
+          <li class="flash flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      {% endwith %}
       {% block content %}{% endblock %}
     </main>
 
     <footer class="site-footer">
-      <p>Leethu demo · local monitoring · mock metrics only</p>
+      <p>Leethu demo · local monitoring · mock metrics only · refresh every 5s</p>
     </footer>
   </div>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

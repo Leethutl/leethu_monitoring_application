@@ -5,25 +5,39 @@
 {% block content %}
 <section class="page-intro">
   <h1>Dashboard</h1>
-  <p class="lede">Overview of monitored Linux servers. Metrics refresh every 5 seconds once inventory is configured.</p>
+  <p class="lede">Overview of monitored Linux servers. CPU, memory, and disk refresh every 5 seconds (mock data).</p>
 </section>
 
-{% if servers %}
-<ul class="server-grid">
-  {% for server in servers %}
-  <li class="server-card">
+{% if cards %}
+<ul class="server-grid" id="dashboard-grid">
+  {% for card in cards %}
+  {% set server = card.server %}
+  {% set m = card.metrics %}
+  <li class="server-card" data-server-id="{{ server.id }}">
     <a href="{{ url_for('server_detail', server_id=server.id) }}">
-      <span class="server-label">{{ server.label or server.host }}</span>
-      <span class="server-host mono">{{ server.host }}</span>
+      <span class="server-label">{{ server.label or server.hostname }}</span>
+      <span class="server-host mono">{{ server.hostname }}</span>
+      <dl class="metric-row">
+        <div><dt>CPU</dt><dd class="mono" data-metric="cpu">{{ m.cpu_percent }}%</dd></div>
+        <div><dt>Mem</dt><dd class="mono" data-metric="mem">{{ m.memory.percent }}%</dd></div>
+        <div><dt>Disk</dt><dd class="mono" data-metric="disk">{{ m.disk_percent }}%</dd></div>
+      </dl>
     </a>
   </li>
   {% endfor %}
 </ul>
+<p class="refresh-hint">Auto-refresh <span class="mono">5s</span></p>
 {% else %}
 <div class="empty-state" role="status">
   <p class="empty-title">No servers yet</p>
   <p class="empty-copy">Add up to 5 Linux servers in Manage servers to see live mock metrics here.</p>
   <a class="btn" href="{{ url_for('manage_servers') }}">Manage servers</a>
 </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if cards %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
 {% endif %}
 {% endblock %}

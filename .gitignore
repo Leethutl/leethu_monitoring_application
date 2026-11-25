@@ -23,8 +23,9 @@ build/
 secrets/
 credentials*
 
-# Inventory may hold demo SSH metadata
-data/inventory.json
+# Inventory may hold demo SSH metadata — keep empty template tracked if desired
+data/servers.json
+!data/.gitkeep
 inventory.json
 
 # IDE / OS

@@ -1,21 +1,90 @@
 {% extends "base.html" %}
 
-{% block title %}Server detail{% endblock %}
+{% block title %}{% if server %}{{ server.label or server.hostname }}{% else %}Server detail{% endif %}{% endblock %}
 
 {% block content %}
+{% if server %}
+<section class="page-intro">
+  <p class="breadcrumb"><a href="{{ url_for('dashboard') }}">Dashboard</a> / Server</p>
+  <h1>{{ server.label or server.hostname }}</h1>
+  <p class="lede mono">{{ server.hostname }} · {{ server.ssh_user }}@port {{ server.ssh_port }}</p>
+</section>
+
+<section class="metrics-panel" id="detail-metrics" data-server-id="{{ server.id }}">
+  <div class="metric-tiles">
+    <article class="metric-tile">
+      <h2>CPU</h2>
+      <p class="metric-value mono" data-field="cpu_percent">{{ metrics.cpu_percent }}%</p>
+    </article>
+    <article class="metric-tile">
+      <h2>Memory</h2>
+      <p class="metric-value mono" data-field="memory_percent">{{ metrics.memory.percent }}%</p>
+      <p class="metric-sub mono" data-field="memory_detail">{{ metrics.memory.used_gb }} / {{ metrics.memory.total_gb }} GiB</p>
+    </article>
+    <article class="metric-tile">
+      <h2>Disk</h2>
+      <p class="metric-value mono" data-field="disk_percent">{{ metrics.disk_percent }}%</p>
+    </article>
+    <article class="metric-tile">
+      <h2>Network</h2>
+      <p class="metric-value mono" data-field="network">↓ {{ metrics.network.rx_mbps }} / ↑ {{ metrics.network.tx_mbps }} Mbps</p>
+    </article>
+    <article class="metric-tile">
+      <h2>Load avg</h2>
+      <p class="metric-value mono" data-field="load_avg">{{ metrics.load_avg[0] }} · {{ metrics.load_avg[1] }} · {{ metrics.load_avg[2] }}</p>
+    </article>
+    <article class="metric-tile">
+      <h2>Uptime</h2>
+      <p class="metric-value mono" data-field="uptime_human">{{ metrics.uptime_human }}</p>
+    </article>
+  </div>
+
+  <h2 class="section-title">Recent history (~2 min)</h2>
+  <div class="charts-grid">
+    <canvas id="chart-cpu" aria-label="CPU chart"></canvas>
+    <canvas id="chart-memory" aria-label="Memory chart"></canvas>
+    <canvas id="chart-network" aria-label="Network chart"></canvas>
+    <canvas id="chart-disk" aria-label="Disk chart"></canvas>
+  </div>
+
+  <h2 class="section-title">Listening ports <span class="muted">(mock · display only)</span></h2>
+  <div class="table-wrap">
+    <table class="data-table" id="ports-table">
+      <thead>
+        <tr><th>Port</th><th>Proto</th><th>Process</th></tr>
+      </thead>
+      <tbody>
+        {% for p in metrics.ports %}
+        <tr>
+          <td class="mono">{{ p.port }}</td>
+          <td class="mono">{{ p.proto }}</td>
+          <td class="mono">{{ p.process }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="refresh-hint">Auto-refresh <span class="mono">5s</span></p>
+</section>
+{% else %}
 <section class="page-intro">
   <p class="breadcrumb"><a href="{{ url_for('dashboard') }}">Dashboard</a> / Server</p>
   <h1>Server detail</h1>
-  <p class="lede">Live metrics, short charts, and listening ports for a single host.</p>
 </section>
-
-{% if server %}
-{# Populated in later phases #}
-{% else %}
 <div class="empty-state" role="status">
   <p class="empty-title">Server not found</p>
-  <p class="empty-copy">No inventory entry for <span class="mono">{{ server_id }}</span>. Add servers from Manage servers, then open them from the dashboard.</p>
+  <p class="empty-copy">No inventory entry for this id. Add servers from Manage servers, then open them from the dashboard.</p>
   <a class="btn" href="{{ url_for('manage_servers') }}">Manage servers</a>
 </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if server %}
+<script>
+  window.__LEETHU_HISTORY__ = {{ history | tojson }};
+</script>
+<script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/server_detail.js') }}" defer></script>
 {% endif %}
 {% endblock %}
