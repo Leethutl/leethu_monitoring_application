@@ -119,13 +119,13 @@ App must start with `host="0.0.0.0"` and `port=5779`. Open `http://127.0.0.1:577
 
 ## 9. Acceptance criteria
 
-- [ ] Login works with `admin` + hashed password; unauthenticated users redirected to login
-- [ ] UI is usable and metrics views are read-only
-- [ ] Can add / edit / delete servers; max 5 enforced
-- [ ] Dashboard and server detail show all metrics listed above
-- [ ] Short charts update; page data refreshes every 5s
-- [ ] Metrics come from mock data (no real remote collection)
-- [ ] Runs locally with the steps in §8
+- [x] Login works with `admin` + hashed password; unauthenticated users redirected to login
+- [x] UI is usable and metrics views are read-only
+- [x] Can add / edit / delete servers; max 5 enforced
+- [x] Dashboard and server detail show all metrics listed above
+- [x] Short charts update; page data refreshes every 5s
+- [x] Metrics come from mock data (no real remote collection)
+- [x] Runs locally with the steps in §8
 
 ## 10. Non-goals (reminder)
 
